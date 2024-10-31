@@ -1,3 +1,5 @@
+// source: https://austinmorlan.com/posts/chip8_emulator/
+
 #include <cstdint>
 
 class Chip8
