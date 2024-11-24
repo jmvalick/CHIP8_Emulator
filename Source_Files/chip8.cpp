@@ -120,6 +120,111 @@ public:
 	// skip next instruction if Vx = kk
 	void OP_3xkk() {
 		uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+		uint8_t byte = opcode & 0x00FFu;
+
+		if (registers[Vx] == byte) {
+			pc += 2;
+		}
 	}
 
+	// 4xkk: SE Vx, byte
+	// skip next instruction if Vx != kk
+	void OP_4xkk() {
+		uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+		uint8_t byte = opcode & 0x00FFu;
+		
+		if (registers[Vx] != byte) {
+			pc += 2;
+		}
+	}
+
+	// 5xy0: SE Vx, Vy
+	// skip next instruction if Vx = Vy
+	void OP_5xy0() {
+		uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+		uint8_t Vy = (opcode & 0x00F0u) >> 4u;
+
+		if (registers[Vx] == registers[Vy]) {
+			pc += 2;
+		}
+	}
+
+	// 6xkk: LD Vx, byte
+	// set Vx = kk
+	void OP_6xkk() {
+		uint8_t Vx = (opcode & 0x0F00) >> 8u;
+		uint8_t byte = opcode & 0x00FFU;
+
+		registers[Vx] = byte;
+	}
+
+	// 7xkk: ADD Vx, byte
+	// set Vx = Vx + kk
+	void OP_7xkk() {
+		uint8_t Vx = (opcode & 0x0F00) >> 8u;
+		uint8_t byte = opcode & 0x00FFU;
+
+		registers[Vx] += byte;
+	}
+
+	// 8xkk: LD Vx, Vy
+	// set Vx = Vy
+	void OP_8xy0() {
+		uint8_t Vx = (opcode & 0x0F00) >> 8u;
+		uint8_t Vy = (opcode & 0x00F0) >> 4u;
+
+		registers[Vx] = registers[Vy];
+	}
+
+	// 8xy1: OR Vx, Vy
+	// set Vx = Vx OR Vy
+	void OP_8xy1() {
+		uint8_t Vx = (opcode & 0x0F00) >> 8u;
+		uint8_t Vy = (opcode & 0x00F0) >> 4u;
+
+		registers[Vx] |= registers[Vy];
+	}
+
+	// 8xy2: AND Vx, Vy
+	// set Vx = Vx AND Vy
+	void OP_8xy2() {
+		uint8_t Vx = (opcode & 0x0F00) >> 8u;
+		uint8_t Vy = (opcode & 0x00F0) >> 4u;
+
+		registers[Vx] &= registers[Vy];
+	}
+
+	// 8xy2: XOR Vx, Vy
+	// set Vx = Vx XOR Vy
+	void OP_8xy2() {
+		uint8_t Vx = (opcode & 0x0F00) >> 8u;
+		uint8_t Vy = (opcode & 0x00F0) >> 4u;
+
+		registers[Vx] ^= registers[Vy];
+	}
+
+	// 8xy4: ADD Vx, Vy
+	// set Vx = Vx + Vy, set VF = carry
+	void OP_8xy4(){
+		uint8_t Vx = (opcode & 0x0F00) >> 8u;
+		uint8_t Vy = (opcode & 0x00F0) >> 4u;
+
+		uint16_t sum = registers[Vx] + registers[Vy];
+
+		registers[0xF] = (sum & 0b0000000100000000) >> 8u;
+		registers[Vx] = sum & 0xFFu;
+	}
+
+	// 8xy5: SUB Vx, Vy
+	// set Vx = Vx - Vy, set VF = NOT borrow
+	void OP_8xy5(){
+		uint8_t Vx = (opcode & 0x0F00) >> 8u;
+		uint8_t Vy = (opcode & 0x00F0) >> 4u;
+
+		registers[0xF] = (registers[Vx] > registers[Vy]);
+		registers[Vx] -= registers[Vy];
+	}
+
+	// 8xy6: SHR Vx
+	// set Vx = Vx SHR 1  
 };
